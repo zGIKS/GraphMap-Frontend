@@ -15,39 +15,11 @@ export const MapControls = ({ summary, onDistanceChange, onReload }) => {
   };
 
   return (
+    <>
     <div className="absolute top-4 left-4 z-[1000] space-y-4">
-      {/* Stats Panel */}
-      {showStats && summary && (
-        <div className="bg-slate-900/90 backdrop-blur-sm rounded-lg shadow-xl p-4 text-white min-w-[250px]">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-lg">Estadísticas</h3>
-            <button
-              onClick={() => setShowStats(false)}
-              className="text-slate-400 hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-slate-400">Ciudades:</span>
-              <span className="font-mono font-semibold text-blue-400">
-                {summary.num_nodes?.toLocaleString() || 0}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Conexiones:</span>
-              <span className="font-mono font-semibold text-purple-400">
-                {summary.num_edges?.toLocaleString() || 0}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Distance Filter */}
-      <div className="bg-slate-900/90 backdrop-blur-sm rounded-lg shadow-xl p-4 text-white">
+      <div className="bg-slate-900/90 backdrop-blur-sm rounded-lg shadow-xl p-4 text-white border-2 border-slate-700">
         <label className="block text-sm font-medium mb-2">
           Distancia Máxima: <span className="text-blue-400">{maxDistance}km</span>
         </label>
@@ -71,7 +43,7 @@ export const MapControls = ({ summary, onDistanceChange, onReload }) => {
         {!showStats && (
           <button
             onClick={() => setShowStats(true)}
-            className="bg-slate-900/90 backdrop-blur-sm hover:bg-slate-800 text-white px-4 py-2 rounded-lg shadow-xl transition-colors"
+            className="bg-slate-900/90 backdrop-blur-sm hover:bg-slate-800 text-white px-4 py-2 rounded-lg shadow-xl transition-colors border-2 border-slate-700"
             title="Mostrar estadísticas"
           >
             📊
@@ -80,12 +52,39 @@ export const MapControls = ({ summary, onDistanceChange, onReload }) => {
 
         <button
           onClick={onReload}
-          className="bg-slate-900/90 backdrop-blur-sm hover:bg-slate-800 text-white px-4 py-2 rounded-lg shadow-xl transition-colors"
+          className="bg-slate-900/90 backdrop-blur-sm hover:bg-slate-800 text-white px-4 py-2 rounded-lg shadow-xl transition-colors border-2 border-slate-700"
           title="Recargar datos"
         >
           🔄
         </button>
       </div>
     </div>
+
+    {/* Stats Panel - Bottom Right */}
+    <div className="absolute bottom-4 right-4 z-[1000]">
+      <div className="bg-slate-900/90 backdrop-blur-sm rounded-lg shadow-xl p-4 text-white min-w-[250px] border-2 border-slate-700">
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-slate-400">Mostrando:</span>
+            <span className="font-mono font-semibold text-blue-400">
+              {summary?.num_nodes?.toLocaleString() || 0} ciudades
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-400">Ciudades:</span>
+            <span className="font-mono font-semibold text-blue-400">
+              {summary?.num_nodes?.toLocaleString() || 0}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-400">Conexiones:</span>
+            <span className="font-mono font-semibold text-purple-400">
+              {summary?.num_edges?.toLocaleString() || 0}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    </>
   );
 };

@@ -47,7 +47,7 @@ export const MapPage = () => {
   }
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full h-screen bg-slate-900">
       <MapControls
         summary={summary}
         onDistanceChange={setMaxDistance}
@@ -59,17 +59,6 @@ export const MapPage = () => {
         edges={edges}
         maxDistance={maxDistance}
       />
-
-      {/* Info Badge */}
-      <div className="absolute bottom-4 right-4 z-[1000]">
-        <div className="bg-slate-900/90 backdrop-blur-sm rounded-lg px-4 py-2 text-white text-sm">
-          <span className="text-slate-400">Mostrando:</span>{' '}
-          <span className="font-semibold text-blue-400">
-            {cities.length.toLocaleString()}
-          </span>{' '}
-          ciudades
-        </div>
-      </div>
     </div>
   );
 };

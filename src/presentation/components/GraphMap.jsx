@@ -52,16 +52,10 @@ export const GraphMap = ({ cities, edges, maxDistance }) => {
       zoom={2}
       minZoom={2}
       maxZoom={12}
-      className="w-full h-screen"
+      className="w-full h-screen bg-slate-900"
       zoomControl={true}
       attributionControl={false}
     >
-      {/* Tema oscuro moderno */}
-      <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        maxZoom={19}
-      />
-
       <ZoomHandler onZoomEnd={handleZoomEnd} />
 
       {/* Renderizar aristas (líneas) */}

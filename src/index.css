@@ -10,4 +10,17 @@
 body {
   font-family: system-ui, -apple-system, sans-serif;
   overflow: hidden;
+  background-color: #0f172a;
+}
+
+#root {
+  background-color: #0f172a;
+}
+
+.leaflet-container {
+  background-color: #0f172a !important;
+}
+
+.leaflet-tile-pane {
+  display: none;
 }
