@@ -2,28 +2,37 @@
  * MapPage - Main Application Page
  * Página principal que orquesta todos los componentes
  */
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useGraphData } from '../../application/hooks/useGraphData';
 import { GraphMap } from '../components/GraphMap';
 import { MapControls } from '../components/MapControls';
-import { LoadingScreen } from '../components/LoadingScreen';
 
 export const MapPage = () => {
   const {
     cities,
     edges,
     summary,
-    loading,
     error,
-    progress,
     reload,
   } = useGraphData();
 
   const [maxDistance, setMaxDistance] = useState(2000);
+  const [isDarkTheme, setIsDarkTheme] = useState(true);
 
-  if (loading) {
-    return <LoadingScreen progress={progress} />;
-  }
+  const toggleTheme = () => {
+    setIsDarkTheme(!isDarkTheme);
+    // Aplicar tema al body
+    document.body.className = !isDarkTheme 
+      ? 'bg-slate-900 text-white transition-colors duration-500' 
+      : 'bg-gray-100 text-gray-900 transition-colors duration-500';
+  };
+
+  // Aplicar tema inicial al body
+  React.useEffect(() => {
+    document.body.className = isDarkTheme 
+      ? 'bg-slate-900 text-white transition-colors duration-500' 
+      : 'bg-gray-100 text-gray-900 transition-colors duration-500';
+  }, [isDarkTheme]);
 
   if (error) {
     return (
@@ -47,17 +56,28 @@ export const MapPage = () => {
   }
 
   return (
-    <div className="relative w-full h-screen bg-slate-900">
+    <div className={`relative w-full h-screen transition-all duration-500 ${
+      isDarkTheme 
+        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' 
+        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
+    }`}>
+      {/* Overlay para mejorar contraste del tema */}
+      <div className={`absolute inset-0 transition-opacity duration-500 ${
+        isDarkTheme ? 'bg-slate-900/20' : 'bg-white/30'
+      }`}></div>
+      
       <MapControls
         summary={summary}
         onDistanceChange={setMaxDistance}
-        onReload={reload}
+        isDarkTheme={isDarkTheme}
+        onToggleTheme={toggleTheme}
       />
 
       <GraphMap
         cities={cities}
         edges={edges}
         maxDistance={maxDistance}
+        isDarkTheme={isDarkTheme}
       />
     </div>
   );

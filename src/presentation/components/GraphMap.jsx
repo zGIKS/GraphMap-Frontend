@@ -3,8 +3,25 @@
  * Componente principal optimizado con virtualización
  */
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Polyline, CircleMarker, Tooltip, useMap } from 'react-leaflet';
 import { MapService } from '../../application/services/MapService';
+
+// Función para ajustar colores en tema claro
+const adjustColorForLight = (color) => {
+  // Hacer los colores más oscuros y saturados para mejor visibilidad en fondo claro
+  const colorMap = {
+    '#ff6b6b': '#dc2626', // rojo más oscuro
+    '#4ecdc4': '#059669', // verde más oscuro
+    '#45b7d1': '#1d4ed8', // azul más oscuro
+    '#96ceb4': '#065f46', // verde oscuro
+    '#ffd93d': '#d97706', // amarillo más oscuro
+    '#6c5ce7': '#5b21b6', // púrpura más oscuro
+    '#fd79a8': '#be185d', // rosa más oscuro
+    '#e17055': '#ea580c', // naranja más oscuro
+  };
+  
+  return colorMap[color] || '#374151'; // gris oscuro por defecto
+};
 
 // Componente para manejar actualizaciones de zoom
 function ZoomHandler({ onZoomEnd }) {
@@ -23,7 +40,7 @@ function ZoomHandler({ onZoomEnd }) {
   return null;
 }
 
-export const GraphMap = ({ cities, edges, maxDistance }) => {
+export const GraphMap = ({ cities, edges, maxDistance, isDarkTheme }) => {
   const [zoomLevel, setZoomLevel] = useState(2);
 
   // Memoizar el lookup de ciudades
@@ -46,16 +63,32 @@ export const GraphMap = ({ cities, edges, maxDistance }) => {
     setZoomLevel(zoom);
   }, []);
 
+  // URLs de tiles según el tema
+  const tileUrl = isDarkTheme 
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+  const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
   return (
     <MapContainer
       center={[20, 0]}
       zoom={2}
       minZoom={2}
       maxZoom={12}
-      className="w-full h-screen bg-slate-900"
+      className={`w-full h-screen transition-all duration-500 z-10 relative ${
+        isDarkTheme ? 'bg-slate-900' : 'bg-gray-50'
+      }`}
       zoomControl={true}
       attributionControl={false}
     >
+      <TileLayer
+        url={tileUrl}
+        attribution={attribution}
+        key={isDarkTheme ? 'dark' : 'light'}
+        className="transition-opacity duration-500"
+      />
+      
       <ZoomHandler onZoomEnd={handleZoomEnd} />
 
       {/* Renderizar aristas (líneas) */}
@@ -65,12 +98,16 @@ export const GraphMap = ({ cities, edges, maxDistance }) => {
 
         if (!source || !target) return null;
 
+        // Ajustar color de las líneas según el tema
+        const baseColor = edge.getColor();
+        const themeAdjustedColor = isDarkTheme ? baseColor : adjustColorForLight(baseColor);
+
         return (
           <Polyline
             key={`edge-${idx}`}
             positions={[source.coordinates, target.coordinates]}
-            color={edge.getColor()}
-            opacity={edge.getOpacity()}
+            color={themeAdjustedColor}
+            opacity={isDarkTheme ? edge.getOpacity() : Math.min(edge.getOpacity() + 0.2, 1)}
             weight={zoomLevel > 5 ? 2 : 1}
           />
         );
@@ -82,19 +119,19 @@ export const GraphMap = ({ cities, edges, maxDistance }) => {
           key={`city-${city.id}`}
           center={city.coordinates}
           radius={zoomLevel > 5 ? 4 : 2}
-          fillColor="#3b82f6"
-          color="#60a5fa"
+          fillColor={isDarkTheme ? "#3b82f6" : "#1d4ed8"}
+          color={isDarkTheme ? "#60a5fa" : "#3b82f6"}
           fillOpacity={0.8}
           weight={1}
         >
-          {/* Tooltip con información */}
+          {/* Tooltip que aparece al hacer hover */}
           {zoomLevel > 6 && (
-            <div className="leaflet-popup-content">
-              <div className="text-xs">
-                <p className="font-bold">{city.name}</p>
-                <p className="text-gray-600">{city.country}</p>
+            <Tooltip direction="top" offset={[0, -10]} permanent={false}>
+              <div className="text-center">
+                <div className={`font-bold text-sm ${isDarkTheme ? 'text-white' : 'text-gray-900'}`}>{city.name}</div>
+                <div className={`text-xs ${isDarkTheme ? 'text-gray-300' : 'text-gray-600'}`}>{city.country}</div>
               </div>
-            </div>
+            </Tooltip>
           )}
         </CircleMarker>
       ))}
