@@ -5,6 +5,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Polyline, CircleMarker, Tooltip, useMap } from 'react-leaflet';
 import { MapService } from '../../application/services/MapService';
+import L from 'leaflet';
 
 // Función para ajustar colores en tema claro
 const adjustColorForLight = (color) => {
@@ -43,6 +44,11 @@ function ZoomHandler({ onZoomEnd }) {
 export const GraphMap = ({ cities, edges, maxDistance, isDarkTheme }) => {
   const [zoomLevel, setZoomLevel] = useState(2);
 
+  // Crear Canvas Renderer para mejor performance
+  const canvasRenderer = useMemo(() => {
+    return L.canvas({ padding: 0.5 });
+  }, []);
+
   // Memoizar el lookup de ciudades
   const cityMap = useMemo(() => {
     return MapService.createCityLookup(cities);
@@ -50,8 +56,16 @@ export const GraphMap = ({ cities, edges, maxDistance, isDarkTheme }) => {
 
   // Filtrar edges por distancia máxima
   const distanceFilteredEdges = useMemo(() => {
-    return edges.filter(edge => edge.distance <= maxDistance);
-  }, [edges, maxDistance]);
+    return edges.filter(edge => {
+      const source = cityMap.get(edge.source);
+      const target = cityMap.get(edge.target);
+      
+      if (!source || !target) return false;
+      
+      const distance = edge.calculateDistance(source, target);
+      return distance <= maxDistance;
+    });
+  }, [edges, maxDistance, cityMap]);
 
   // Filtrar edges visibles según zoom (optimización)
   const visibleEdges = useMemo(() => {
@@ -79,8 +93,12 @@ export const GraphMap = ({ cities, edges, maxDistance, isDarkTheme }) => {
       className={`w-full h-screen transition-all duration-500 z-10 relative ${
         isDarkTheme ? 'bg-slate-900' : 'bg-gray-50'
       }`}
-      zoomControl={true}
+      zoomControl={false}
       attributionControl={false}
+      scrollWheelZoom={true}
+      doubleClickZoom={true}
+      touchZoom={true}
+      dragging={true}
     >
       <TileLayer
         url={tileUrl}

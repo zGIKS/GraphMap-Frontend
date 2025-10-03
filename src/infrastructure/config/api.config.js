@@ -13,7 +13,7 @@ const getEnvVar = (name, defaultValue = null) => {
 };
 
 // Validar que las variables críticas estén definidas
-const BASE_URL = getEnvVar('VITE_API_BASE_URL', 'http://localhost:8000');
+const BASE_URL = getEnvVar('VITE_API_BASE_URL', 'http://127.0.0.1:8000');
 const TIMEOUT = parseInt(getEnvVar('VITE_API_TIMEOUT', '30000'));
 
 export const API_CONFIG = {

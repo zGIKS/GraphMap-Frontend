@@ -26,12 +26,14 @@ export class MapService {
     }
 
     return edges.filter(edge => {
-      if (edge.distance > maxDistance) return false;
-
       const source = cityMap.get(edge.source);
       const target = cityMap.get(edge.target);
 
-      return source && target;
+      if (!source || !target) return false;
+
+      // Calcular distancia dinámicamente si no está disponible
+      const distance = edge.calculateDistance(source, target);
+      return distance <= maxDistance;
     });
   }
 

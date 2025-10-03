@@ -5,45 +5,39 @@
 import React, { useState } from 'react';
 import { useGraphData } from '../../application/hooks/useGraphData';
 import { GraphMap } from '../components/GraphMap';
-import { MapControls } from '../components/MapControls';
+import { LoadingScreen } from '../components/LoadingScreen';
 
 export const MapPage = () => {
   const {
     cities,
     edges,
-    summary,
+    loading,
     error,
     reload,
   } = useGraphData();
 
-  const [maxDistance, setMaxDistance] = useState(2000);
-  const [isDarkTheme, setIsDarkTheme] = useState(true);
-
-  const toggleTheme = () => {
-    setIsDarkTheme(!isDarkTheme);
-    // Aplicar tema al body
-    document.body.className = !isDarkTheme 
-      ? 'bg-slate-900 text-white transition-colors duration-500' 
-      : 'bg-gray-100 text-gray-900 transition-colors duration-500';
-  };
+  const [maxDistance] = useState(2000);
+  const [isDarkTheme] = useState(true);
 
   // Aplicar tema inicial al body
   React.useEffect(() => {
-    document.body.className = isDarkTheme 
-      ? 'bg-slate-900 text-white transition-colors duration-500' 
+    document.body.className = isDarkTheme
+      ? 'bg-slate-900 text-white transition-colors duration-500'
       : 'bg-gray-100 text-gray-900 transition-colors duration-500';
   }, [isDarkTheme]);
 
+  // Mostrar loading screen
+  if (loading) {
+    return <LoadingScreen isDarkTheme={isDarkTheme} />;
+  }
+
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-4">
-        <div className="bg-slate-800/80 backdrop-blur-sm rounded-lg p-8 max-w-md text-center">
-          <div className="text-red-500 text-5xl mb-4">❌</div>
-          <h2 className="text-2xl font-bold text-white mb-2">Error de conexión</h2>
-          <p className="text-slate-300 mb-4">{error}</p>
-          <p className="text-slate-400 text-sm mb-4">
-            Asegúrate de que el backend esté corriendo en http://127.0.0.1:8000
-          </p>
+      <div className={`min-h-screen flex items-center justify-center ${
+        isDarkTheme ? 'bg-slate-900' : 'bg-gray-50'
+      }`}>
+        <div className="text-center">
+          <p className={`text-lg mb-4 ${isDarkTheme ? 'text-white' : 'text-gray-900'}`}>Error de conexión</p>
           <button
             onClick={reload}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
@@ -57,21 +51,14 @@ export const MapPage = () => {
 
   return (
     <div className={`relative w-full h-screen transition-all duration-500 ${
-      isDarkTheme 
-        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' 
+      isDarkTheme
+        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
         : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
     }`}>
       {/* Overlay para mejorar contraste del tema */}
       <div className={`absolute inset-0 transition-opacity duration-500 ${
         isDarkTheme ? 'bg-slate-900/20' : 'bg-white/30'
       }`}></div>
-      
-      <MapControls
-        summary={summary}
-        onDistanceChange={setMaxDistance}
-        isDarkTheme={isDarkTheme}
-        onToggleTheme={toggleTheme}
-      />
 
       <GraphMap
         cities={cities}

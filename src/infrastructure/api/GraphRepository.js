@@ -33,7 +33,8 @@ export class GraphRepository extends IGraphRepository {
     }
 
     const data = await httpClient.get(API_CONFIG.ENDPOINTS.CITIES);
-    this.cache.cities = data.cities.map((city) => new City(city));
+    // El endpoint devuelve directamente el array de ciudades
+    this.cache.cities = Array.isArray(data) ? data.map((city) => new City(city)) : data.cities.map((city) => new City(city));
     this.cache.timestamp = Date.now();
 
     return this.cache.cities;
@@ -45,7 +46,8 @@ export class GraphRepository extends IGraphRepository {
     }
 
     const data = await httpClient.get(API_CONFIG.ENDPOINTS.EDGES);
-    this.cache.edges = data.edges.map((edge) => new Edge(edge));
+    // El endpoint devuelve directamente el array de edges
+    this.cache.edges = Array.isArray(data) ? data.map((edge) => new Edge(edge)) : data.edges.map((edge) => new Edge(edge));
 
     return this.cache.edges;
   }
