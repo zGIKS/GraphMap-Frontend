@@ -11,10 +11,11 @@ interface City {
 interface SidebarProps {
   cities: City[];
   nodeCount: number;
+  edgeCount: number;
   onCityClick?: (city: City) => void;
 }
 
-export const Sidebar = ({ cities, nodeCount, onCityClick }: SidebarProps) => {
+export const Sidebar = ({ cities, nodeCount, edgeCount, onCityClick }: SidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -61,12 +62,19 @@ export const Sidebar = ({ cities, nodeCount, onCityClick }: SidebarProps) => {
             <h2 className="text-2xl font-bold mb-4">Cities</h2>
             
             {/* Stats Card integrada */}
-            <div className="bg-gray-700/50 backdrop-blur-sm px-4 py-3 rounded-lg border border-gray-600/50">
+            <div className="bg-gray-700/50 backdrop-blur-sm px-4 py-3 rounded-lg border border-gray-600/50 space-y-2">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <div className="text-sm">
                   <span className="font-semibold text-gray-300">Nodes:</span>{' '}
                   <span className="font-mono text-green-400">{nodeCount.toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                <div className="text-sm">
+                  <span className="font-semibold text-gray-300">Edges:</span>{' '}
+                  <span className="font-mono text-blue-400">{edgeCount.toLocaleString()}</span>
                 </div>
               </div>
             </div>

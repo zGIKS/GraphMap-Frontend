@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title>FAB Graph Icon</title>
+  <desc>Graph logo for FAB icon, azul con nodo central más grande.</desc>
+
+  <!-- Edges -->
+  <g fill="none" stroke="#007BFF" stroke-width="28" stroke-linecap="round">
+    <line x1="256" y1="256" x2="256" y2="116"/>
+    <line x1="256" y1="256" x2="376" y2="196"/>
+    <line x1="256" y1="256" x2="376" y2="316"/>
+    <line x1="256" y1="256" x2="256" y2="396"/>
+    <line x1="256" y1="256" x2="136" y2="316"/>
+    <line x1="256" y1="256" x2="136" y2="196"/>
+    <line x1="256" y1="116" x2="376" y2="196"/>
+    <line x1="376" y1="196" x2="376" y2="316"/>
+    <line x1="376" y1="316" x2="256" y2="396"/>
+    <line x1="256" y1="396" x2="136" y2="316"/>
+    <line x1="136" y1="316" x2="136" y2="196"/>
+    <line x1="136" y1="196" x2="256" y2="116"/>
+  </g>
+
+  <!-- Nodes -->
+  <g fill="#007BFF" stroke="none">
+    <!-- Nodo central más grande -->
+    <circle cx="256" cy="256" r="50"/>
+    <circle cx="256" cy="116" r="32"/>
+    <circle cx="376" cy="196" r="32"/>
+    <circle cx="376" cy="316" r="32"/>
+    <circle cx="256" cy="396" r="32"/>
+    <circle cx="136" cy="316" r="32"/>
+    <circle cx="136" cy="196" r="32"/>
+  </g>
+</svg>

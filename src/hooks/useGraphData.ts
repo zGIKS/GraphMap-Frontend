@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Graph from 'graphology';
 import Sigma from 'sigma';
 import { API_ENDPOINTS } from '../config';
-import type { CitiesResponse, City } from '../types';
+import type { CitiesResponse, City, EdgesResponse } from '../types';
 
 interface UseGraphDataProps {
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -14,6 +14,7 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [nodeCount, setNodeCount] = useState(0);
+  const [edgeCount, setEdgeCount] = useState(0);
   const [cities, setCities] = useState<City[]>([]);
 
   useEffect(() => {
@@ -58,6 +59,29 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
           });
         });
 
+        // Cargar las aristas
+        const edgesResponse = await fetch(API_ENDPOINTS.graphEdges);
+        if (edgesResponse.ok) {
+          const edgesData: EdgesResponse = await edgesResponse.json();
+          
+          if (edgesData.edges && mounted) {
+            edgesData.edges.forEach((edge) => {
+              const sourceId = edge.source.toString();
+              const targetId = edge.target.toString();
+              
+              // Solo agregar arista si ambos nodos existen
+              if (graph.hasNode(sourceId) && graph.hasNode(targetId)) {
+                graph.addEdge(sourceId, targetId, {
+                  size: 0.5,
+                  color: '#666666',
+                });
+              }
+            });
+            
+            setEdgeCount(graph.size);
+          }
+        }
+
         if (containerRef.current && mounted) {
           if (sigmaRef.current) {
             sigmaRef.current.kill();
@@ -91,5 +115,5 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
     };
   }, [containerRef, webglSupported]);
 
-  return { loading, error, nodeCount, cities };
+  return { loading, error, nodeCount, edgeCount, cities };
 };

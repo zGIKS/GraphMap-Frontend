@@ -6,7 +6,7 @@ import { ErrorOverlay, LoadingSpinner, Sidebar } from './components';
 const GraphViewer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const webglSupported = useWebGL();
-  const { loading, error, nodeCount, cities } = useGraphData({ containerRef, webglSupported });
+  const { loading, error, nodeCount, edgeCount, cities } = useGraphData({ containerRef, webglSupported });
 
   const handleCityClick = (city: { id: number; city: string; lat: number; lng: number }) => {
     console.log('City clicked:', city);
@@ -16,7 +16,7 @@ const GraphViewer = () => {
   return (
     <div className="w-full h-screen relative bg-gray-900 overflow-hidden">
       {!loading && !error && (
-        <Sidebar cities={cities} nodeCount={nodeCount} onCityClick={handleCityClick} />
+        <Sidebar cities={cities} nodeCount={nodeCount} edgeCount={edgeCount} onCityClick={handleCityClick} />
       )}
       
       <div className="absolute inset-0">
