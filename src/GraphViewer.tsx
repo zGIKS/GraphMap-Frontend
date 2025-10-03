@@ -15,7 +15,9 @@ const GraphViewer = () => {
 
   return (
     <div className="w-full h-screen relative bg-gray-900 overflow-hidden">
-      <Sidebar cities={cities} nodeCount={nodeCount} onCityClick={handleCityClick} />
+      {!loading && !error && (
+        <Sidebar cities={cities} nodeCount={nodeCount} onCityClick={handleCityClick} />
+      )}
       
       <div className="absolute inset-0">
         {error && <ErrorOverlay error={error} webglSupported={webglSupported} />}

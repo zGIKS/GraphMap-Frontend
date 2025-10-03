@@ -7,7 +7,7 @@ export const ErrorOverlay = ({ error, webglSupported }: ErrorOverlayProps) => {
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-gray-900/90 z-10">
       <div className="bg-red-900 text-white p-6 rounded-lg shadow-xl max-w-2xl">
-        <h2 className="text-xl font-bold mb-2">⚠️ Error Loading Graph</h2>
+        <h2 className="text-xl font-bold mb-2">Error Loading Graph</h2>
         <p className="mb-4">{error}</p>
 
         {!webglSupported && (
@@ -34,7 +34,7 @@ export const ErrorOverlay = ({ error, webglSupported }: ErrorOverlayProps) => {
 
         {webglSupported && (
           <p className="mt-4 text-sm text-gray-300">
-            Make sure the backend is running at http://127.0.0.1:8000
+            Please contact mtteoo on Discord for further assistance.
           </p>
         )}
       </div>
