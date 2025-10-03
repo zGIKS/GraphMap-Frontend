@@ -1,17 +1,22 @@
 import { useRef } from 'react';
 import { useWebGL } from './hooks/useWebGL';
 import { useGraphData } from './hooks/useGraphData';
-import { ErrorOverlay } from './components/ErrorOverlay';
-import { LoadingSpinner } from './components/LoadingSpinner';
-import { StatsCard } from './components/StatsCard';
+import { ErrorOverlay, LoadingSpinner, Sidebar } from './components';
 
 const GraphViewer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const webglSupported = useWebGL();
-  const { loading, error, nodeCount } = useGraphData({ containerRef, webglSupported });
+  const { loading, error, nodeCount, cities } = useGraphData({ containerRef, webglSupported });
+
+  const handleCityClick = (city: { id: number; city: string; lat: number; lng: number }) => {
+    console.log('City clicked:', city);
+    // TODO: Implementar zoom/focus en el nodo seleccionado
+  };
 
   return (
     <div className="w-full h-screen relative bg-gray-900 overflow-hidden">
+      <Sidebar cities={cities} nodeCount={nodeCount} onCityClick={handleCityClick} />
+      
       <div className="absolute inset-0">
         {error && <ErrorOverlay error={error} webglSupported={webglSupported} />}
         
@@ -22,7 +27,6 @@ const GraphViewer = () => {
         />
       </div>
 
-      {!loading && !error && <StatsCard nodeCount={nodeCount} />}
       {loading && !error && <LoadingSpinner />}
     </div>
   );

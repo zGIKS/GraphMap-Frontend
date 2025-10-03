@@ -14,6 +14,7 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [nodeCount, setNodeCount] = useState(0);
+  const [cities, setCities] = useState<City[]>([]);
 
   useEffect(() => {
     if (!webglSupported) {
@@ -44,6 +45,7 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
         const data: CitiesResponse = await response.json();
         if (!mounted || !data.cities?.length) return;
 
+        setCities(data.cities);
         const graph = new Graph();
 
         data.cities.forEach((city: City) => {
@@ -89,5 +91,5 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
     };
   }, [containerRef, webglSupported]);
 
-  return { loading, error, nodeCount };
+  return { loading, error, nodeCount, cities };
 };
