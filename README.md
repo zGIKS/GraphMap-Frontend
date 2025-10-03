@@ -62,15 +62,42 @@ src/
 ## 🚀 Instalación y Uso
 
 ```bash
-# 1. Instalar dependencias
+# 1. Clonar el repositorio
+git clone <repo-url>
+cd GraphMap-Frontend
+
+# 2. Instalar dependencias
 npm install
 
-# 2. Iniciar servidor de desarrollo
+# 3. Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus configuraciones
+
+# 4. Iniciar servidor de desarrollo
 npm run dev
 
-# 3. Abrir en navegador
+# 5. Abrir en navegador
 # http://localhost:5173
 ```
+
+## ⚙️ Variables de Entorno
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```env
+# API Configuration
+VITE_API_BASE_URL=http://127.0.0.1:8000
+VITE_API_TIMEOUT=30000
+
+# Environment
+VITE_ENV=development
+```
+
+### Descripción de variables:
+
+- `VITE_API_BASE_URL`: URL base del backend API
+- `VITE_API_TIMEOUT`: Timeout para las requests HTTP (en ms)
+- `VITE_ENV`: Entorno de ejecución (development/production)
 
 ## 🔌 Endpoints Consumidos
 
@@ -165,15 +192,25 @@ Las conexiones cambian de color según la distancia:
 
 ## 🔧 Configuración
 
-Para cambiar la URL del backend, edita:
+### Variables de Entorno
 
-```javascript
-// src/infrastructure/config/api.config.js
-export const API_CONFIG = {
-  BASE_URL: 'http://127.0.0.1:8000',
-  // ...
-};
+Para cambiar la configuración del backend, edita el archivo `.env`:
+
+```env
+# Ejemplo para desarrollo local
+VITE_API_BASE_URL=http://127.0.0.1:8000
+
+# Ejemplo para producción
+VITE_API_BASE_URL=https://api.tudominio.com
 ```
+
+### Configuración por defecto
+
+Si no se especifican variables de entorno, se usarán estos valores por defecto:
+
+- **Base URL**: `http://localhost:8000`
+- **Timeout**: `30000ms` (30 segundos)
+- **Environment**: `development`
 
 ## 📦 Scripts Disponibles
 
