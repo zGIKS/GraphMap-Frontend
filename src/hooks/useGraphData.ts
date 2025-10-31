@@ -26,6 +26,34 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
 
     let mounted = true;
 
+    // Observar cambios en el tema
+    const themeObserver = new MutationObserver(() => {
+      if (sigmaRef.current) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const nodeColor = isDark ? '#e4e4e7' : '#0a0a0a';
+        const edgeColor = isDark ? '#52525b' : '#d4d4d8';
+
+        const graph = sigmaRef.current.getGraph();
+
+        // Actualizar colores de nodos
+        graph.forEachNode((node) => {
+          graph.setNodeAttribute(node, 'color', nodeColor);
+        });
+
+        // Actualizar colores de aristas
+        graph.forEachEdge((edge) => {
+          graph.setEdgeAttribute(edge, 'color', edgeColor);
+        });
+
+        sigmaRef.current.refresh();
+      }
+    });
+
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
     const initGraph = async () => {
       try {
         setLoading(true);
@@ -49,13 +77,22 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
         setCities(data.cities);
         const graph = new Graph();
 
+        // Obtener colores según el tema actual
+        const isDark = document.documentElement.classList.contains('dark');
+
+        // Colores para nodos: oscuro en light mode, claro en dark mode
+        const nodeColor = isDark ? '#e4e4e7' : '#0a0a0a';
+
+        // Colores para aristas: más sutiles
+        const edgeColor = isDark ? '#52525b' : '#d4d4d8';
+
         data.cities.forEach((city: City) => {
           graph.addNode(city.id.toString(), {
             label: city.city,
             x: city.lng,
             y: city.lat,
             size: 2,
-            color: '#1f77b4',
+            color: nodeColor,
           });
         });
 
@@ -73,7 +110,7 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
               if (graph.hasNode(sourceId) && graph.hasNode(targetId)) {
                 graph.addEdge(sourceId, targetId, {
                   size: 0.5,
-                  color: '#666666',
+                  color: edgeColor,
                 });
               }
             });
@@ -108,6 +145,7 @@ export const useGraphData = ({ containerRef, webglSupported }: UseGraphDataProps
     return () => {
       mounted = false;
       clearTimeout(timer);
+      themeObserver.disconnect();
       if (sigmaRef.current) {
         sigmaRef.current.kill();
         sigmaRef.current = null;

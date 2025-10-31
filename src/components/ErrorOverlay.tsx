@@ -8,20 +8,20 @@ interface ErrorOverlayProps {
 
 export const ErrorOverlay = ({ error, webglSupported }: ErrorOverlayProps) => {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/90 z-10 p-4">
+    <div className="absolute inset-0 flex items-center justify-center bg-background/90 z-10 p-4">
       <div className="max-w-2xl w-full">
-        <Alert variant="destructive" className="bg-red-900 border-red-700 text-white">
+        <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Error Loading Graph</AlertTitle>
           <AlertDescription className="mt-2">{error}</AlertDescription>
         </Alert>
 
         {!webglSupported && (
-          <Alert className="mt-4 bg-red-800 border-red-700 text-white">
+          <Alert className="mt-4">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>How to enable WebGL</AlertTitle>
             <AlertDescription className="mt-2">
-              <ul className="list-disc list-inside space-y-1 text-gray-200 text-sm">
+              <ul className="list-disc list-inside space-y-1 text-sm">
                 <li>
                   <strong>Firefox:</strong> Go to <code>about:config</code>, search for{' '}
                   <code>webgl.disabled</code> and set it to <code>false</code>
@@ -42,7 +42,7 @@ export const ErrorOverlay = ({ error, webglSupported }: ErrorOverlayProps) => {
         )}
 
         {webglSupported && (
-          <Alert className="mt-4 bg-gray-800 border-gray-700 text-white">
+          <Alert className="mt-4">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
               Please contact mtteoo on Discord for further assistance.

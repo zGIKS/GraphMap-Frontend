@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title>FAB Graph Icon</title>
-  <desc>Graph logo for FAB icon, azul con nodo central más grande.</desc>
+  <desc>Graph logo for FAB icon, adaptable theme colors.</desc>
+
+  <style>
+    @media (prefers-color-scheme: light) {
+      .edges { stroke: #d4d4d8; }
+      .nodes { fill: #0a0a0a; }
+    }
+    @media (prefers-color-scheme: dark) {
+      .edges { stroke: #52525b; }
+      .nodes { fill: #e4e4e7; }
+    }
+    :root:not(.dark) .edges { stroke: #d4d4d8; }
+    :root:not(.dark) .nodes { fill: #0a0a0a; }
+    :root.dark .edges { stroke: #52525b; }
+    :root.dark .nodes { fill: #e4e4e7; }
+  </style>
 
   <!-- Edges -->
-  <g fill="none" stroke="#007BFF" stroke-width="28" stroke-linecap="round">
+  <g class="edges" fill="none" stroke-width="28" stroke-linecap="round">
     <line x1="256" y1="256" x2="256" y2="116"/>
     <line x1="256" y1="256" x2="376" y2="196"/>
     <line x1="256" y1="256" x2="376" y2="316"/>
@@ -20,7 +35,7 @@
   </g>
 
   <!-- Nodes -->
-  <g fill="#007BFF" stroke="none">
+  <g class="nodes" stroke="none">
     <!-- Nodo central más grande -->
     <circle cx="256" cy="256" r="50"/>
     <circle cx="256" cy="116" r="32"/>
