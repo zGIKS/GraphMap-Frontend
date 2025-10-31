@@ -1,3 +1,6 @@
+import { AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
 interface ErrorOverlayProps {
   error: string;
   webglSupported: boolean;
@@ -5,37 +8,46 @@ interface ErrorOverlayProps {
 
 export const ErrorOverlay = ({ error, webglSupported }: ErrorOverlayProps) => {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/90 z-10">
-      <div className="bg-red-900 text-white p-6 rounded-lg shadow-xl max-w-2xl">
-        <h2 className="text-xl font-bold mb-2">Error Loading Graph</h2>
-        <p className="mb-4">{error}</p>
+    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/90 z-10 p-4">
+      <div className="max-w-2xl w-full">
+        <Alert variant="destructive" className="bg-red-900 border-red-700 text-white">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Error Loading Graph</AlertTitle>
+          <AlertDescription className="mt-2">{error}</AlertDescription>
+        </Alert>
 
         {!webglSupported && (
-          <div className="bg-red-800 p-4 rounded mt-4 text-sm">
-            <p className="font-semibold mb-2">How to enable WebGL:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-200">
-              <li>
-                <strong>Firefox:</strong> Go to <code>about:config</code>, search for{' '}
-                <code>webgl.disabled</code> and set it to <code>false</code>
-              </li>
-              <li>
-                <strong>Chrome:</strong> Go to <code>chrome://settings</code> → System →
-                Enable "Use hardware acceleration when available"
-              </li>
-              <li>
-                <strong>Edge:</strong> Similar to Chrome, enable hardware acceleration in
-                settings
-              </li>
-              <li>Try a different browser (Chrome, Firefox, Edge)</li>
-              <li>Update your graphics drivers</li>
-            </ul>
-          </div>
+          <Alert className="mt-4 bg-red-800 border-red-700 text-white">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>How to enable WebGL</AlertTitle>
+            <AlertDescription className="mt-2">
+              <ul className="list-disc list-inside space-y-1 text-gray-200 text-sm">
+                <li>
+                  <strong>Firefox:</strong> Go to <code>about:config</code>, search for{' '}
+                  <code>webgl.disabled</code> and set it to <code>false</code>
+                </li>
+                <li>
+                  <strong>Chrome:</strong> Go to <code>chrome://settings</code> → System →
+                  Enable "Use hardware acceleration when available"
+                </li>
+                <li>
+                  <strong>Edge:</strong> Similar to Chrome, enable hardware acceleration in
+                  settings
+                </li>
+                <li>Try a different browser (Chrome, Firefox, Edge)</li>
+                <li>Update your graphics drivers</li>
+              </ul>
+            </AlertDescription>
+          </Alert>
         )}
 
         {webglSupported && (
-          <p className="mt-4 text-sm text-gray-300">
-            Please contact mtteoo on Discord for further assistance.
-          </p>
+          <Alert className="mt-4 bg-gray-800 border-gray-700 text-white">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Please contact mtteoo on Discord for further assistance.
+            </AlertDescription>
+          </Alert>
         )}
       </div>
     </div>
