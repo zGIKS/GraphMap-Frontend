@@ -1,4 +1,12 @@
-export { StatsCard } from './StatsCard';
 export { LoadingSpinner } from './LoadingSpinner';
 export { ErrorOverlay } from './ErrorOverlay';
 export { Sidebar } from './Sidebar';
+export { StatsSection } from './StatsSection';
+export { PathSelectionSection } from './PathSelectionSection';
+export { SearchSection } from './SearchSection';
+export { CityListSection } from './CityListSection';
+export { ChatSection } from './chat/ChatSection';
+export { ChatToggleButton } from './chat/ChatToggleButton';
+export { MessageList } from './chat/MessageList';
+export { ChatInput } from './chat/ChatInput';
+export type { ChatMessage, ChatSectionProps } from './chat/ChatTypes';

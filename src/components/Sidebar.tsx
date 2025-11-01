@@ -1,5 +1,12 @@
-import { useState } from 'react';
-import { Menu, X, Search } from 'lucide-react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { StatsSection } from './StatsSection';
+import { PathSelectionSection } from './PathSelectionSection';
+import { SearchSection } from './SearchSection';
+import { CityListSection } from './CityListSection';
+import debounce from 'lodash.debounce';
 
 interface City {
   id: number;
@@ -10,116 +17,118 @@ interface City {
 
 interface SidebarProps {
   cities: City[];
-  nodeCount: number;
-  edgeCount: number;
-  onCityClick?: (city: City) => void;
+  onPathSearch?: (startId: number, endId: number) => void;
 }
 
-export const Sidebar = ({ cities, nodeCount, edgeCount, onCityClick }: SidebarProps) => {
+export const Sidebar = ({ cities, onPathSearch }: SidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [startNode, setStartNode] = useState<City | null>(null);
+  const [endNode, setEndNode] = useState<City | null>(null);
 
-  const filteredCities = cities.filter((city) =>
-    city.city.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Debounce search term updates
+  useEffect(() => {
+    const debouncedUpdate = debounce(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
 
-  const handleCityClick = (city: City) => {
-    onCityClick?.(city);
-    // Close sidebar on mobile after selection
-    if (window.innerWidth < 768) {
-      setIsOpen(false);
+    debouncedUpdate();
+
+    return () => {
+      debouncedUpdate.cancel();
+    };
+  }, [searchTerm]);
+
+  // Buscar por coordenadas en lugar de nombre
+  const filteredCities = useMemo(() => {
+    if (!debouncedSearchTerm) return cities.slice(0, 100);
+
+    const searchLower = debouncedSearchTerm.toLowerCase().trim();
+
+    const filtered = cities.filter((city) => {
+      // Buscar por coordenadas (lat, lng)
+      const coords = `${city.lat.toFixed(4)}, ${city.lng.toFixed(4)}`;
+      if (coords.includes(searchLower)) return true;
+
+      // También permitir búsqueda por nombre de ciudad
+      if (city.city.toLowerCase().includes(searchLower)) return true;
+
+      return false;
+    });
+
+    return filtered.slice(0, 500);
+  }, [cities, debouncedSearchTerm]);
+
+  const handleSelectNode = useCallback((city: City) => {
+    if (!startNode) {
+      // Primer click: seleccionar nodo de inicio
+      setStartNode(city);
+    } else if (!endNode) {
+      // Segundo click: seleccionar nodo final
+      setEndNode(city);
     }
-  };
+  }, [startNode, endNode]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
+
+  const handleFindPath = useCallback(() => {
+    if (startNode && endNode && onPathSearch) {
+      onPathSearch(startNode.id, endNode.id);
+    }
+  }, [startNode, endNode, onPathSearch]);
+
+  const handleClearPath = useCallback(() => {
+    setStartNode(null);
+    setEndNode(null);
+  }, []);
 
   return (
-    <>
-      {/* Hamburger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 bg-gray-800/90 backdrop-blur-sm text-white rounded-lg shadow-lg hover:bg-gray-700 transition-all"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
-
-      {/* Overlay for mobile */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 h-full bg-gray-800/95 backdrop-blur-md text-white z-40 transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } w-80 md:w-96 shadow-2xl`}
-      >
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          className="fixed top-4 left-4 z-50 backdrop-blur-sm"
+          aria-label="Toggle menu"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-80 md:w-96 p-0">
         <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="p-6 pt-16 border-b border-gray-700">
-            <h2 className="text-2xl font-bold mb-4">Cities</h2>
-            
-            {/* Stats Card integrada */}
-            <div className="bg-gray-700/50 backdrop-blur-sm px-4 py-3 rounded-lg border border-gray-600/50 space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <div className="text-sm">
-                  <span className="font-semibold text-gray-300">Nodes:</span>{' '}
-                  <span className="font-mono text-green-400">{nodeCount.toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                <div className="text-sm">
-                  <span className="font-semibold text-gray-300">Edges:</span>{' '}
-                  <span className="font-mono text-blue-400">{edgeCount.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <SheetHeader className="p-6 pb-4">
+            <SheetTitle className="text-2xl font-bold">Shortest Path</SheetTitle>
+          </SheetHeader>
 
-          {/* Search */}
-          <div className="p-4 border-b border-gray-700">
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="Search cities..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+          <StatsSection />
 
-          {/* City List */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {filteredCities.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">No cities found</p>
-            ) : (
-              <ul className="space-y-2">
-                {filteredCities.map((city) => (
-                  <li
-                    key={city.id}
-                    onClick={() => handleCityClick(city)}
-                    className="p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg cursor-pointer transition-colors"
-                  >
-                    <div className="font-semibold">{city.city}</div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      {city.lat.toFixed(4)}, {city.lng.toFixed(4)}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <PathSelectionSection
+            startNode={startNode}
+            endNode={endNode}
+            onStartNodeChange={setStartNode}
+            onEndNodeChange={setEndNode}
+            onFindPath={handleFindPath}
+            onClearPath={handleClearPath}
+          />
+
+          <SearchSection
+            searchTerm={searchTerm}
+            debouncedSearchTerm={debouncedSearchTerm}
+            onSearchChange={handleSearchChange}
+          />
+
+          <CityListSection
+            cities={filteredCities}
+            startNode={startNode}
+            endNode={endNode}
+            debouncedSearchTerm={debouncedSearchTerm}
+            onSelectNode={handleSelectNode}
+          />
         </div>
-      </div>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 };
