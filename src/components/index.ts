@@ -5,3 +5,4 @@ export { StatsSection } from './StatsSection';
 export { PathSelectionSection } from './PathSelectionSection';
 export { SearchSection } from './SearchSection';
 export { CityListSection } from './CityListSection';
+export { ChatSection } from './ChatSection';

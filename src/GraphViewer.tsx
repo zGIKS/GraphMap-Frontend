@@ -1,9 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { useWebGL } from './hooks/useWebGL';
 import { useGraphData } from './hooks/useGraphData';
 import { useTheme } from './hooks';
-import { ErrorOverlay, LoadingSpinner, Sidebar } from './components';
+import { ErrorOverlay, LoadingSpinner, Sidebar, ChatSection } from './components';
 import { Button } from './components/ui/button';
 
 const GraphViewer = () => {
@@ -11,6 +11,7 @@ const GraphViewer = () => {
   const webglSupported = useWebGL();
   const { loading, error, cities, findShortestPath } = useGraphData({ containerRef, webglSupported });
   const { theme, toggleTheme } = useTheme();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handlePathSearch = async (startId: number, endId: number) => {
     await findShortestPath(startId, endId);
@@ -32,6 +33,9 @@ const GraphViewer = () => {
           >
             {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           </Button>
+
+          {/* Chat Section */}
+          <ChatSection isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
         </>
       )}
 

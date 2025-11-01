@@ -6,4 +6,5 @@ export const API_ENDPOINTS = {
   graphEdges: `${API_BASE_URL}/graph/edges`,
   graphSummary: `${API_BASE_URL}/graph/summary`,
   shortestPath: `${API_BASE_URL}/graph/shortest-path`,
+  chat: `${API_BASE_URL}/chat/`,
 } as const;
