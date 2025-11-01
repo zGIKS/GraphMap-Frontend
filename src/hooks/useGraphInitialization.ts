@@ -100,7 +100,7 @@ export const useGraphInitialization = ({
                     color: edgeColor,
                   });
                   addedCount++;
-                } catch (err) {
+                } catch {
                   // Edge might already exist
                   skippedCount++;
                   skippedEdges.push(`${sourceId} → ${targetId}`);

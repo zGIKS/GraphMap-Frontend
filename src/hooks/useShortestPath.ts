@@ -34,7 +34,7 @@ export const useShortestPath = (sigmaRef: React.RefObject<Sigma | null>) => {
         const targetId = data.path[i + 1].id.toString();
 
         // Buscar la arista entre estos dos nodos
-        let edge = graph.edge(sourceId, targetId);
+        const edge = graph.edge(sourceId, targetId);
 
         // Si no existe la arista, crearla temporalmente para visualizar el camino
         if (!edge) {
