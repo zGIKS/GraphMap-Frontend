@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Menu, Search } from 'lucide-react';
+import { Menu, Search, Navigation, Target, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,13 +18,15 @@ interface SidebarProps {
   cities: City[];
   nodeCount: number;
   edgeCount: number;
-  onCityClick?: (city: City) => void;
+  onPathSearch?: (startId: number, endId: number) => void;
 }
 
-export const Sidebar = ({ cities, nodeCount, edgeCount, onCityClick }: SidebarProps) => {
+export const Sidebar = ({ cities, nodeCount, edgeCount, onPathSearch }: SidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [startNode, setStartNode] = useState<City | null>(null);
+  const [endNode, setEndNode] = useState<City | null>(null);
 
   // Debounce search term updates
   useEffect(() => {
@@ -39,24 +41,49 @@ export const Sidebar = ({ cities, nodeCount, edgeCount, onCityClick }: SidebarPr
     };
   }, [searchTerm]);
 
+  // Buscar por coordenadas en lugar de nombre
   const filteredCities = useMemo(() => {
-    if (!debouncedSearchTerm) return cities.slice(0, 100); // Limit initial display
-    const filtered = cities.filter((city) =>
-      city.city.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-    );
-    return filtered.slice(0, 500); // Limit search results
+    if (!debouncedSearchTerm) return cities.slice(0, 100);
+
+    const searchLower = debouncedSearchTerm.toLowerCase().trim();
+
+    const filtered = cities.filter((city) => {
+      // Buscar por coordenadas (lat, lng)
+      const coords = `${city.lat.toFixed(4)}, ${city.lng.toFixed(4)}`;
+      if (coords.includes(searchLower)) return true;
+
+      // También permitir búsqueda por nombre de ciudad
+      if (city.city.toLowerCase().includes(searchLower)) return true;
+
+      return false;
+    });
+
+    return filtered.slice(0, 500);
   }, [cities, debouncedSearchTerm]);
 
-  const handleCityClick = useCallback((city: City) => {
-    onCityClick?.(city);
-    // Close sidebar on mobile after selection
-    if (window.innerWidth < 768) {
-      setIsOpen(false);
+  const handleSelectNode = useCallback((city: City) => {
+    if (!startNode) {
+      // Primer click: seleccionar nodo de inicio
+      setStartNode(city);
+    } else if (!endNode) {
+      // Segundo click: seleccionar nodo final
+      setEndNode(city);
     }
-  }, [onCityClick]);
+  }, [startNode, endNode]);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+  }, []);
+
+  const handleFindPath = useCallback(() => {
+    if (startNode && endNode && onPathSearch) {
+      onPathSearch(startNode.id, endNode.id);
+    }
+  }, [startNode, endNode, onPathSearch]);
+
+  const handleClearPath = useCallback(() => {
+    setStartNode(null);
+    setEndNode(null);
   }, []);
 
   return (
@@ -74,7 +101,7 @@ export const Sidebar = ({ cities, nodeCount, edgeCount, onCityClick }: SidebarPr
       <SheetContent side="left" className="w-80 md:w-96 p-0">
         <div className="flex flex-col h-full">
           <SheetHeader className="p-6 pb-4">
-            <SheetTitle className="text-2xl font-bold">Cities</SheetTitle>
+            <SheetTitle className="text-2xl font-bold">Shortest Path</SheetTitle>
           </SheetHeader>
 
           {/* Stats Card */}
@@ -99,13 +126,79 @@ export const Sidebar = ({ cities, nodeCount, edgeCount, onCityClick }: SidebarPr
             </Card>
           </div>
 
+          {/* Selected Nodes */}
+          <div className="px-6 mb-4 space-y-2">
+            {/* Start Node - Siempre visible */}
+            <div className="flex items-center gap-2 p-2 bg-muted rounded-lg border border-border min-h-[52px]">
+              <Navigation className="h-3 w-3 text-primary" />
+              <div className="flex-1 min-w-0">
+                {startNode ? (
+                  <>
+                    <div className="text-xs font-medium truncate">{startNode.city}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {startNode.lat.toFixed(4)}, {startNode.lng.toFixed(4)}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-xs text-muted-foreground">Start node</div>
+                )}
+              </div>
+              {startNode && (
+                <Button variant="ghost" size="icon-sm" onClick={() => setStartNode(null)}>
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+
+            {/* End Node - Siempre visible */}
+            <div className="flex items-center gap-2 p-2 bg-muted rounded-lg border border-border min-h-[52px]">
+              <Target className="h-3 w-3 text-primary" />
+              <div className="flex-1 min-w-0">
+                {endNode ? (
+                  <>
+                    <div className="text-xs font-medium truncate">{endNode.city}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {endNode.lat.toFixed(4)}, {endNode.lng.toFixed(4)}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-xs text-muted-foreground">End node</div>
+                )}
+              </div>
+              {endNode && (
+                <Button variant="ghost" size="icon-sm" onClick={() => setEndNode(null)}>
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                className="flex-1"
+                onClick={handleFindPath}
+                size="sm"
+                disabled={!startNode || !endNode}
+              >
+                Find Path
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearPath}
+                disabled={!startNode && !endNode}
+              >
+                Clear
+              </Button>
+            </div>
+          </div>
+
           {/* Search */}
           <div className="px-6 mb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="text"
-                placeholder="Search cities..."
+                placeholder="Search by coordinates or city..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="pl-10"
@@ -119,29 +212,44 @@ export const Sidebar = ({ cities, nodeCount, edgeCount, onCityClick }: SidebarPr
           </div>
 
           {/* City List */}
-          <div className="flex-1 px-6 pb-6 overflow-hidden">
-            <ScrollArea className="h-[calc(100vh-280px)] w-full">
+          <div className="flex-1 px-6 pb-6 min-h-0">
+            <ScrollArea className="h-full w-full">
               {filteredCities.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  {debouncedSearchTerm ? 'No cities found' : 'Loading cities...'}
+                <p className="text-muted-foreground text-center py-8 text-xs">
+                  {debouncedSearchTerm ? 'No nodes found' : 'Loading nodes...'}
                 </p>
               ) : (
                 <div className="space-y-2 pr-4">
-                  {debouncedSearchTerm && filteredCities.length >= 500 && (
-                    <p className="text-destructive text-sm text-center py-2">
-                      Showing first 500 results. Refine your search for better results.
-                    </p>
-                  )}
                   {filteredCities.map((city) => (
                     <div
                       key={city.id}
-                      className="p-3 bg-muted border border-border rounded-lg hover:bg-accent cursor-pointer transition-colors"
-                      onClick={() => handleCityClick(city)}
+                      className="p-2 bg-muted border border-border rounded-lg hover:bg-accent transition-colors"
                     >
-                      <div className="font-semibold">{city.city}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <div className="font-semibold text-xs">{city.city}</div>
+                      <div className="text-[10px] text-muted-foreground mb-2">
                         {city.lat.toFixed(4)}, {city.lng.toFixed(4)}
                       </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSelectNode(city)}
+                        className="w-full h-6 text-[10px]"
+                        disabled={startNode?.id === city.id || endNode?.id === city.id}
+                      >
+                        {!startNode ? (
+                          <>
+                            <Navigation className="h-3 w-3 mr-1" />
+                            Select Start
+                          </>
+                        ) : !endNode ? (
+                          <>
+                            <Target className="h-3 w-3 mr-1" />
+                            Select End
+                          </>
+                        ) : (
+                          'Selected'
+                        )}
+                      </Button>
                     </div>
                   ))}
                 </div>

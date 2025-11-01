@@ -22,3 +22,10 @@ export interface GraphSummary {
   num_nodes: number;
   num_edges: number;
 }
+
+export interface ShortestPathResponse {
+  path: City[];
+  distance: number;
+  cities_explored: number;
+  path_length: number;
+}

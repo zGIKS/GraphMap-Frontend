@@ -5,4 +5,5 @@ export const API_ENDPOINTS = {
   citiesCount: `${API_BASE_URL}/cities/count`,
   graphEdges: `${API_BASE_URL}/graph/edges`,
   graphSummary: `${API_BASE_URL}/graph/summary`,
+  shortestPath: `${API_BASE_URL}/graph/shortest-path`,
 } as const;
