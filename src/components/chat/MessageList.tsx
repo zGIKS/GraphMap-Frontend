@@ -1,17 +1,12 @@
 import { forwardRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import ReactMarkdown from 'react-markdown';
 import type { ChatMessage } from './ChatTypes';
 
 interface MessageListProps {
   messages: ChatMessage[];
   isLoading: boolean;
 }
-
-const parseMarkdown = (text: string) => {
-  // Simple bold parsing: **text** -> <strong>text</strong>
-  // Newlines: \n -> <br>
-  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-};
 
 export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
   ({ messages, isLoading }, ref) => {
@@ -29,8 +24,11 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
                     ? 'bg-muted text-muted-foreground'
                     : 'bg-primary text-primary-foreground'
                 }`}
-                dangerouslySetInnerHTML={{ __html: parseMarkdown(message.content) }}
-              />
+              >
+                <div className="prose prose-sm max-w-none">
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                </div>
+              </div>
             </div>
           ))}
           {isLoading && (
