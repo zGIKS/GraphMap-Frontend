@@ -9,7 +9,7 @@ import { Button } from './components/ui/button';
 const GraphViewer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const webglSupported = useWebGL();
-  const { loading, error, nodeCount, edgeCount, cities, findShortestPath } = useGraphData({ containerRef, webglSupported });
+  const { loading, error, cities, findShortestPath } = useGraphData({ containerRef, webglSupported });
   const { theme, toggleTheme } = useTheme();
 
   const handlePathSearch = async (startId: number, endId: number) => {
@@ -20,7 +20,7 @@ const GraphViewer = () => {
     <div className="w-full h-screen relative bg-background overflow-hidden">
       {!loading && !error && (
         <>
-          <Sidebar cities={cities} nodeCount={nodeCount} edgeCount={edgeCount} onPathSearch={handlePathSearch} />
+          <Sidebar cities={cities} onPathSearch={handlePathSearch} />
 
           {/* Theme Toggle Button */}
           <Button

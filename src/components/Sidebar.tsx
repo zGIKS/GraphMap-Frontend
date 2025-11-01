@@ -17,12 +17,10 @@ interface City {
 
 interface SidebarProps {
   cities: City[];
-  nodeCount: number;
-  edgeCount: number;
   onPathSearch?: (startId: number, endId: number) => void;
 }
 
-export const Sidebar = ({ cities, nodeCount, edgeCount, onPathSearch }: SidebarProps) => {
+export const Sidebar = ({ cities, onPathSearch }: SidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -105,7 +103,7 @@ export const Sidebar = ({ cities, nodeCount, edgeCount, onPathSearch }: SidebarP
             <SheetTitle className="text-2xl font-bold">Shortest Path</SheetTitle>
           </SheetHeader>
 
-          <StatsSection nodeCount={nodeCount} edgeCount={edgeCount} />
+          <StatsSection />
 
           <PathSelectionSection
             startNode={startNode}
